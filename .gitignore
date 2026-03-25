@@ -45,5 +45,8 @@ yarn-error.log*
 # Test coverage
 coverage/
 
+# APK builds
+*.apk
+
 # Turborepo
 .turbo/
