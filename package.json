@@ -1,0 +1,24 @@
+{
+  "name": "pos-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Point of Sale system - monorepo with mobile and desktop apps",
+  "scripts": {
+    "mobile": "pnpm --filter @pos/mobile",
+    "desktop": "pnpm --filter @pos/desktop",
+    "core": "pnpm --filter @pos/core",
+    "build:core": "pnpm --filter @pos/core build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "electron",
+      "esbuild"
+    ]
+  }
+}
