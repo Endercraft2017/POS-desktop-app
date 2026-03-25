@@ -1,0 +1,39 @@
+{
+  "name": "@pos/mobile",
+  "version": "1.0.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "dev": "expo start",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx"
+  },
+  "dependencies": {
+    "@pos/core": "workspace:*",
+    "expo": "~52.0.0",
+    "expo-router": "~4.0.0",
+    "expo-status-bar": "~2.0.0",
+    "expo-secure-store": "~14.0.0",
+    "expo-image": "~2.0.0",
+    "expo-font": "~13.0.0",
+    "react": "18.3.1",
+    "react-native": "0.76.6",
+    "react-native-safe-area-context": "~5.0.0",
+    "react-native-screens": "~4.4.0",
+    "react-native-reanimated": "~3.16.0",
+    "react-native-gesture-handler": "~2.20.0",
+    "@op-engineering/op-sqlite": "^10.0.0",
+    "drizzle-orm": "^0.35.0",
+    "zustand": "^5.0.0",
+    "@tanstack/react-query": "^5.60.0",
+    "zod": "^3.23.0",
+    "ulidx": "^2.4.0"
+  },
+  "devDependencies": {
+    "@types/react": "~18.3.0",
+    "typescript": "^5.5.0",
+    "drizzle-kit": "^0.28.0"
+  }
+}

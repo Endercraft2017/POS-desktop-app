@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "POS System",
+    "slug": "pos-mobile",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./src/assets/icon.png",
+    "scheme": "pos",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0F172A"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/adaptive-icon.png",
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.pos.mobile"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-font",
+        {
+          "fonts": []
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
