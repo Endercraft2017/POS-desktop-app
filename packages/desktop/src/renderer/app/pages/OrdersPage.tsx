@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "../../hooks/use-theme";
 import { orderRepo } from "../../lib/repositories";
 import type { OrderRow } from "../../lib/repositories";
+import { Tooltip } from "../../components/ui/Tooltip";
 
 type OrderStatus = "pending" | "held" | "completed" | "cancelled";
 
@@ -218,18 +219,22 @@ export function OrdersPage() {
             <div style={{ display: "flex", gap: spacing.xs }}>
               {order.status === "pending" && (
                 <>
-                  <button
-                    style={actionBtnStyle("hold")}
-                    onClick={() => handleHold(order.id)}
-                  >
-                    Hold
-                  </button>
-                  <button
-                    style={actionBtnStyle("cancel")}
-                    onClick={() => handleCancel(order.id)}
-                  >
-                    Cancel
-                  </button>
+                  <Tooltip text="Save this order to process later" position="left">
+                    <button
+                      style={actionBtnStyle("hold")}
+                      onClick={() => handleHold(order.id)}
+                    >
+                      Hold
+                    </button>
+                  </Tooltip>
+                  <Tooltip text="Cancel this order permanently" position="left">
+                    <button
+                      style={actionBtnStyle("cancel")}
+                      onClick={() => handleCancel(order.id)}
+                    >
+                      Cancel
+                    </button>
+                  </Tooltip>
                 </>
               )}
             </div>

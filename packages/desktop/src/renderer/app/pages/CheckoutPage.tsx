@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "../../hooks/use-theme";
 import { useCartStore } from "../../stores/cart-store";
 import { productRepo, categoryRepo } from "../../lib/repositories";
+import { Tooltip } from "../../components/ui/Tooltip";
 
 export function CheckoutPage() {
   const { colors, spacing, borderRadius, fontSize } = useTheme();
@@ -290,9 +291,11 @@ export function CheckoutPage() {
             Cart ({cart.items.length})
           </span>
           {cart.items.length > 0 && (
-            <button style={clearBtnStyle} onClick={clear}>
-              Clear
-            </button>
+            <Tooltip text="Remove all items from the cart" position="bottom">
+              <button style={clearBtnStyle} onClick={clear}>
+                Clear
+              </button>
+            </Tooltip>
           )}
         </div>
 
@@ -405,16 +408,19 @@ export function CheckoutPage() {
             <span>Total</span>
             <span>${cart.total.toFixed(2)}</span>
           </div>
-          <button
-            style={{
-              ...chargeBtnStyle,
-              opacity: cart.items.length === 0 ? 0.5 : 1,
-            }}
-            disabled={cart.items.length === 0}
-            onClick={handleCharge}
-          >
-            Charge ${cart.total.toFixed(2)}
-          </button>
+          <Tooltip text="Proceed to payment" position="top">
+            <button
+              style={{
+                ...chargeBtnStyle,
+                opacity: cart.items.length === 0 ? 0.5 : 1,
+                width: "100%",
+              }}
+              disabled={cart.items.length === 0}
+              onClick={handleCharge}
+            >
+              Charge ${cart.total.toFixed(2)}
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>

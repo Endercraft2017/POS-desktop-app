@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../hooks/use-theme";
 import { useAuthStore } from "../../stores/auth-store";
+import { useSettingsStore } from "../../stores/settings-store";
+import { Tooltip } from "../../components/ui/Tooltip";
 
 const SETTING_LINKS = [
   { label: "Categories", description: "Manage product categories" },
@@ -11,11 +13,18 @@ const SETTING_LINKS = [
   { label: "Employees", description: "Manage employee accounts and PINs" },
 ];
 
+const THEME_OPTIONS: { value: "system" | "light" | "dark"; label: string }[] = [
+  { value: "system", label: "System" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
 export function SettingsPage() {
-  const { colors, spacing, borderRadius, fontSize, isDark, toggle } =
+  const { colors, spacing, borderRadius, fontSize, isDark, themeMode, setThemeMode } =
     useTheme();
   const navigate = useNavigate();
   const { currentEmployee, logout } = useAuthStore();
+  const { tooltipsEnabled, setTooltipsEnabled } = useSettingsStore();
 
   const handleSignOut = () => {
     logout();
@@ -102,17 +111,41 @@ export function SettingsPage() {
     cursor: "pointer",
   };
 
-  const toggleBtnStyle: React.CSSProperties = {
+  const themeBtnStyle = (active: boolean): React.CSSProperties => ({
     padding: `${spacing.xs}px ${spacing.md}px`,
     fontSize: fontSize.sm,
     fontWeight: 600,
-    backgroundColor: colors.buttonSecondary,
-    color: colors.buttonSecondaryText,
-    border: `1px solid ${colors.border}`,
-    borderRadius: borderRadius.md,
+    backgroundColor: active ? colors.primary : colors.buttonSecondary,
+    color: active ? colors.textOnPrimary : colors.buttonSecondaryText,
+    border: `1px solid ${active ? colors.primary : colors.border}`,
+    borderRadius: borderRadius.sm,
     cursor: "pointer",
-    minHeight: 36,
-  };
+    minHeight: 32,
+    transition: "all 0.15s ease",
+  });
+
+  const toggleTrackStyle = (on: boolean): React.CSSProperties => ({
+    width: 44,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: on ? colors.primary : colors.border,
+    position: "relative",
+    cursor: "pointer",
+    transition: "background-color 0.2s ease",
+    flexShrink: 0,
+  });
+
+  const toggleKnobStyle = (on: boolean): React.CSSProperties => ({
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: "#fff",
+    position: "absolute",
+    top: 3,
+    left: on ? 23 : 3,
+    transition: "left 0.2s ease",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+  });
 
   return (
     <div style={containerStyle}>
@@ -152,39 +185,40 @@ export function SettingsPage() {
         <h2 style={sectionTitleStyle}>Management</h2>
         <div style={cardStyle}>
           {SETTING_LINKS.map((link, i) => (
-            <button
-              key={link.label}
-              style={{
-                ...linkBtnStyle,
-                borderBottom:
-                  i === SETTING_LINKS.length - 1
-                    ? "none"
-                    : linkBtnStyle.borderBottom,
-              }}
-              onClick={() => alert("Coming soon")}
-            >
-              <div>
-                <div>{link.label}</div>
-                <div
+            <Tooltip key={link.label} text={link.description} position="right">
+              <button
+                style={{
+                  ...linkBtnStyle,
+                  borderBottom:
+                    i === SETTING_LINKS.length - 1
+                      ? "none"
+                      : linkBtnStyle.borderBottom,
+                }}
+                onClick={() => alert("Coming soon")}
+              >
+                <div>
+                  <div>{link.label}</div>
+                  <div
+                    style={{
+                      fontSize: fontSize.xs,
+                      color: colors.textTertiary,
+                      fontWeight: 400,
+                      marginTop: 2,
+                    }}
+                  >
+                    {link.description}
+                  </div>
+                </div>
+                <span
                   style={{
-                    fontSize: fontSize.xs,
+                    fontSize: fontSize.lg,
                     color: colors.textTertiary,
-                    fontWeight: 400,
-                    marginTop: 2,
                   }}
                 >
-                  {link.description}
-                </div>
-              </div>
-              <span
-                style={{
-                  fontSize: fontSize.lg,
-                  color: colors.textTertiary,
-                }}
-              >
-                &rsaquo;
-              </span>
-            </button>
+                  &rsaquo;
+                </span>
+              </button>
+            </Tooltip>
           ))}
         </div>
       </div>
@@ -193,11 +227,75 @@ export function SettingsPage() {
       <div>
         <h2 style={sectionTitleStyle}>Appearance</h2>
         <div style={cardStyle}>
+          {/* Theme Mode */}
           <div style={rowStyle}>
-            <span style={labelStyle}>Theme</span>
-            <button style={toggleBtnStyle} onClick={toggle}>
-              {isDark ? "Switch to Light" : "Switch to Dark"}
-            </button>
+            <div>
+              <span style={labelStyle}>Theme</span>
+              <div
+                style={{
+                  fontSize: fontSize.xs,
+                  color: colors.textTertiary,
+                  marginTop: 2,
+                }}
+              >
+                Currently {isDark ? "dark" : "light"}
+                {themeMode === "system" ? " (following system)" : ""}
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 4 }}>
+              {THEME_OPTIONS.map((opt) => (
+                <Tooltip
+                  key={opt.value}
+                  text={
+                    opt.value === "system"
+                      ? "Follow your OS theme preference"
+                      : `Always use ${opt.value} mode`
+                  }
+                  position="top"
+                >
+                  <button
+                    style={themeBtnStyle(themeMode === opt.value)}
+                    onClick={() => setThemeMode(opt.value)}
+                  >
+                    {opt.label}
+                  </button>
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+
+          {/* Tooltips Toggle */}
+          <div
+            style={{
+              ...rowStyle,
+              borderTop: `1px solid ${colors.border}`,
+            }}
+          >
+            <div>
+              <span style={labelStyle}>Tooltips</span>
+              <div
+                style={{
+                  fontSize: fontSize.xs,
+                  color: colors.textTertiary,
+                  marginTop: 2,
+                }}
+              >
+                Show helpful hints when hovering over elements
+              </div>
+            </div>
+            <Tooltip
+              text={tooltipsEnabled ? "Click to disable tooltips" : "Click to enable tooltips"}
+              position="left"
+            >
+              <div
+                style={toggleTrackStyle(tooltipsEnabled)}
+                onClick={() => setTooltipsEnabled(!tooltipsEnabled)}
+                role="switch"
+                aria-checked={tooltipsEnabled}
+              >
+                <div style={toggleKnobStyle(tooltipsEnabled)} />
+              </div>
+            </Tooltip>
           </div>
         </div>
       </div>
@@ -223,9 +321,11 @@ export function SettingsPage() {
       </div>
 
       {/* Sign Out */}
-      <button style={signOutBtnStyle} onClick={handleSignOut}>
-        Sign Out
-      </button>
+      <Tooltip text="Sign out of this session" position="top">
+        <button style={signOutBtnStyle} onClick={handleSignOut}>
+          Sign Out
+        </button>
+      </Tooltip>
     </div>
   );
 }

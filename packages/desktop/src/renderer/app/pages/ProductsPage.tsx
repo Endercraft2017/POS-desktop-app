@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTheme } from "../../hooks/use-theme";
 import { productRepo, categoryRepo } from "../../lib/repositories";
 import type { ProductRow } from "../../lib/repositories";
+import { Tooltip } from "../../components/ui/Tooltip";
 
 interface ProductForm {
   name: string;
@@ -306,9 +307,11 @@ export function ProductsPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button style={addBtnStyle} onClick={openAdd}>
-          + Add Product
-        </button>
+        <Tooltip text="Create a new product entry" position="bottom">
+          <button style={addBtnStyle} onClick={openAdd}>
+            + Add Product
+          </button>
+        </Tooltip>
       </div>
 
       <div style={tableHeaderStyle}>
@@ -340,18 +343,22 @@ export function ProductsPage() {
               {product.is_active === 1 ? "Active" : "Inactive"}
             </span>
             <div style={{ display: "flex", gap: spacing.xs }}>
-              <button
-                style={actionBtnSmall("edit")}
-                onClick={() => openEdit(product)}
-              >
-                Edit
-              </button>
-              <button
-                style={actionBtnSmall("delete")}
-                onClick={() => handleDelete(product.id)}
-              >
-                Delete
-              </button>
+              <Tooltip text="Edit product details" position="left">
+                <button
+                  style={actionBtnSmall("edit")}
+                  onClick={() => openEdit(product)}
+                >
+                  Edit
+                </button>
+              </Tooltip>
+              <Tooltip text="Remove this product" position="left">
+                <button
+                  style={actionBtnSmall("delete")}
+                  onClick={() => handleDelete(product.id)}
+                >
+                  Delete
+                </button>
+              </Tooltip>
             </div>
           </div>
         ))}
