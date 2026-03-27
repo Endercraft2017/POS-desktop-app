@@ -2,6 +2,8 @@
   "name": "@pos/desktop",
   "version": "1.0.0",
   "private": true,
+  "description": "POS System Desktop Application",
+  "author": "Kyle",
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",

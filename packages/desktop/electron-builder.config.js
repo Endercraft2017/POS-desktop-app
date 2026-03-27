@@ -1,14 +1,15 @@
 /** @type {import('electron-builder').Configuration} */
 module.exports = {
   appId: "com.pos.desktop",
-  productName: "POS System",
+  productName: "POS-System",
+  electronVersion: "33.4.11",
+  npmRebuild: false,
   directories: {
     output: "release",
   },
-  files: ["dist/**/*", "package.json"],
+  files: ["out/**/*", "package.json"],
   win: {
     target: ["nsis"],
-    icon: "src/renderer/assets/icon.ico",
   },
   nsis: {
     oneClick: false,
@@ -16,7 +17,7 @@ module.exports = {
   },
   extraResources: [
     {
-      from: "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      from: "../../node_modules/better-sqlite3/build/Release/better_sqlite3.node",
       to: "better_sqlite3.node",
     },
   ],

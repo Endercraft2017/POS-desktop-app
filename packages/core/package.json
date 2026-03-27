@@ -5,12 +5,36 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./dist/index.js",
-    "./schema": "./dist/schema/index.js",
-    "./types": "./dist/types/index.js",
-    "./services": "./dist/services/index.js",
-    "./validators": "./dist/validators/index.js",
-    "./utils": "./dist/utils/index.js"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.ts",
+      "import": "./src/schema/index.ts",
+      "default": "./dist/schema/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./src/types/index.ts",
+      "default": "./dist/types/index.js"
+    },
+    "./services": {
+      "types": "./dist/services/index.d.ts",
+      "import": "./src/services/index.ts",
+      "default": "./dist/services/index.js"
+    },
+    "./validators": {
+      "types": "./dist/validators/index.d.ts",
+      "import": "./src/validators/index.ts",
+      "default": "./dist/validators/index.js"
+    },
+    "./utils": {
+      "types": "./dist/utils/index.d.ts",
+      "import": "./src/utils/index.ts",
+      "default": "./dist/utils/index.js"
+    }
   },
   "scripts": {
     "build": "tsc",

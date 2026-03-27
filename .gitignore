@@ -45,8 +45,10 @@ yarn-error.log*
 # Test coverage
 coverage/
 
-# APK builds
+# Build artifacts
 *.apk
+*.exe
+*.blockmap
 
 # Turborepo
 .turbo/
