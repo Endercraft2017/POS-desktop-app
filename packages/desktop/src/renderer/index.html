@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>POS System</title>
+    <link rel="manifest" href="/app/manifest.webmanifest" />
+    <link rel="icon" href="/app/icon-192.png" />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <!-- Preconnect to the API so the TLS + DNS handshake happens during the
+         initial bundle download, not after. -->
+    <link rel="preconnect" href="https://3ks.afkcube.com" crossorigin="anonymous" />
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body, #root { height: 100%; width: 100%; }
@@ -11,7 +19,18 @@
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;background:#0f172a;color:#e2e8f0;font-family:sans-serif;">
+        <p>Loading POS System...</p>
+      </div>
+    </div>
     <script type="module" src="./main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(function () {});
+        });
+      }
+    </script>
   </body>
 </html>

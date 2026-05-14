@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6c057">
+  <title>3Ks Tambayan</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Default landing — shown when no ?card= param is present -->
+  <div id="default-view">
+    <header class="hero">
+      <h1>3Ks Tambayan</h1>
+      <p class="subtitle">Welcome! Order, pick-up, deliver.</p>
+    </header>
+    <p class="hint">
+      <a href="/download">Download the app</a> · Manage your orders on the go.
+    </p>
+  </div>
+
+  <!-- Personalized loyalty view — populated by loyalty-view.js when ?card= is present -->
+  <div id="loyalty-view" hidden></div>
+
+  <script src="loyalty-view.js" defer></script>
+</body>
+</html>

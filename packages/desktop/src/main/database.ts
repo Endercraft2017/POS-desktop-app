@@ -1,10 +1,14 @@
-import Database from "better-sqlite3";
 import path from "path";
 import { app } from "electron";
+import { createRequire } from "module";
 
-let db: Database.Database | null = null;
+// Use createRequire to load native modules at runtime, bypassing Vite bundling
+const nativeRequire = createRequire(__filename);
+const Database = nativeRequire("better-sqlite3");
 
-export function getDatabase(): Database.Database {
+let db: any = null;
+
+export function getDatabase(): any {
   if (!db) {
     const dbPath = path.join(app.getPath("userData"), "pos.db");
     db = new Database(dbPath);
@@ -42,9 +46,13 @@ export async function initializeDatabase(): Promise<void> {
       description TEXT,
       price REAL NOT NULL,
       cost_price REAL DEFAULT 0,
-      category_id TEXT REFERENCES categories(id),
+      markup_percent REAL DEFAULT 0,
+      category_ids TEXT DEFAULT '',
+      tags TEXT DEFAULT '',
       image_uri TEXT,
       barcode TEXT,
+      is_sub_product INTEGER NOT NULL DEFAULT 0,
+      parent_ids TEXT DEFAULT '',
       is_active INTEGER NOT NULL DEFAULT 1,
       sort_order INTEGER DEFAULT 0
     );
@@ -57,6 +65,7 @@ export async function initializeDatabase(): Promise<void> {
       deleted_at TEXT,
       name TEXT NOT NULL,
       unit TEXT NOT NULL,
+      cost_per_unit REAL DEFAULT 0,
       current_stock REAL DEFAULT 0,
       min_stock REAL DEFAULT 0,
       is_active INTEGER NOT NULL DEFAULT 1
@@ -144,6 +153,7 @@ export async function initializeDatabase(): Promise<void> {
       discount_type TEXT DEFAULT 'none',
       discount_value REAL DEFAULT 0,
       notes TEXT,
+      customer_name TEXT,
       employee_id TEXT REFERENCES employees(id),
       customer_id TEXT,
       completed_at TEXT
@@ -223,8 +233,25 @@ export async function initializeDatabase(): Promise<void> {
       amount REAL NOT NULL,
       frequency TEXT NOT NULL DEFAULT 'daily',
       notes TEXT,
-      is_active INTEGER NOT NULL DEFAULT 1
+      is_active INTEGER NOT NULL DEFAULT 1,
+      due_date TEXT,
+      paid_at TEXT,
+      exclude_from_expenses INTEGER NOT NULL DEFAULT 0
     );
+
+    CREATE TABLE IF NOT EXISTS expense_payments (
+      id TEXT PRIMARY KEY,
+      device_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      deleted_at TEXT,
+      expense_id TEXT NOT NULL,
+      amount REAL NOT NULL,
+      paid_on TEXT NOT NULL,
+      method TEXT,
+      notes TEXT
+    );
+    CREATE INDEX IF NOT EXISTS idx_expense_payments_expense ON expense_payments(expense_id);
 
     CREATE TABLE IF NOT EXISTS customers (
       id TEXT PRIMARY KEY,
@@ -366,10 +393,47 @@ export async function initializeDatabase(): Promise<void> {
       amount REAL NOT NULL
     );
 
-    CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+    CREATE TABLE IF NOT EXISTS ingredient_presets (
+      id TEXT PRIMARY KEY,
+      device_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      deleted_at TEXT,
+      name TEXT NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS ingredient_preset_items (
+      id TEXT PRIMARY KEY,
+      device_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      deleted_at TEXT,
+      preset_id TEXT NOT NULL REFERENCES ingredient_presets(id),
+      ingredient_id TEXT NOT NULL REFERENCES ingredients(id),
+      quantity REAL NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS loyalty_cards (
+      id TEXT PRIMARY KEY,
+      device_id TEXT NOT NULL,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      deleted_at TEXT,
+      code TEXT NOT NULL UNIQUE,
+      customer_name TEXT,
+      stamps INTEGER NOT NULL DEFAULT 0,
+      rewards_claimed_mask INTEGER NOT NULL DEFAULT 0,
+      last_seen_at TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_loyalty_cards_code ON loyalty_cards(code);
+    CREATE INDEX IF NOT EXISTS idx_loyalty_cards_last_seen ON loyalty_cards(last_seen_at);
+
     CREATE INDEX IF NOT EXISTS idx_products_active ON products(is_active);
     CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
     CREATE INDEX IF NOT EXISTS idx_orders_date ON orders(created_at);
+    CREATE INDEX IF NOT EXISTS idx_orders_active_date ON orders(deleted_at, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_id);
     CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
     CREATE INDEX IF NOT EXISTS idx_product_ingredients_product ON product_ingredients(product_id);
     CREATE INDEX IF NOT EXISTS idx_sync_log_synced ON sync_log(synced);
@@ -386,4 +450,24 @@ export async function initializeDatabase(): Promise<void> {
     CREATE INDEX IF NOT EXISTS idx_loyalty_transactions_customer ON loyalty_transactions(customer_id);
     CREATE INDEX IF NOT EXISTS idx_loyalty_transactions_order ON loyalty_transactions(order_id);
   `);
+
+  // Idempotent column migrations for existing DBs that predate schema changes.
+  // SQLite throws "duplicate column name" if the column already exists — swallow it.
+  // Returns true if the column was actually added (so callers can run a one-shot backfill).
+  const addColumn = (sql: string): boolean => {
+    try { database.exec(sql); return true; }
+    catch (e: any) { if (/duplicate column/i.test(e.message || "")) return false; throw e; }
+  };
+  addColumn("ALTER TABLE orders ADD COLUMN customer_name TEXT");
+
+  // A/P feature: add due_date + paid_at to operational_expenses, and backfill
+  // paid_at = created_at on first install so existing rows count as already-paid
+  // (preserves report semantics — only NEW rows can be unpaid payables).
+  addColumn("ALTER TABLE operational_expenses ADD COLUMN due_date TEXT");
+  if (addColumn("ALTER TABLE operational_expenses ADD COLUMN paid_at TEXT")) {
+    database.exec("UPDATE operational_expenses SET paid_at = created_at WHERE paid_at IS NULL");
+  }
+  // Toggle for whether a payable's payments roll into spending reports.
+  // 0 = include (default, matches legacy behavior), 1 = exclude.
+  addColumn("ALTER TABLE operational_expenses ADD COLUMN exclude_from_expenses INTEGER NOT NULL DEFAULT 0");
 }

@@ -1,0 +1,16 @@
+{
+  "name": "messenger-watch",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Headless Chromium watcher for the business Facebook Page inbox. Detects new Messenger conversations and POSTs them to the POS sync API.",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "bootstrap-login": "node src/bootstrap-login.js",
+    "deploy": "bash deploy.sh"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "playwright-core": "^1.48.0"
+  }
+}

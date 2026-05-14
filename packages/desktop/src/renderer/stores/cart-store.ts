@@ -13,8 +13,12 @@ import type { DiscountType } from "@pos/core/types";
 type CartStore = {
   cart: Cart;
   defaultTaxRate: number;
+  // Customer name for the current order. Lives in the store (not local state)
+  // so the ChatPanel agent can read and update it from anywhere.
+  customerName: string;
   setDefaultTaxRate: (rate: number) => void;
-  addItem: (product: { id: string; name: string; price: number }) => void;
+  setCustomerName: (name: string) => void;
+  addItem: (product: { id: string; name: string; price: number }, quantity?: number) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   removeItem: (productId: string) => void;
   applyDiscount: (type: DiscountType, value: number) => void;
@@ -24,10 +28,12 @@ type CartStore = {
 export const useCartStore = create<CartStore>((set) => ({
   cart: createEmptyCart(),
   defaultTaxRate: 0,
+  customerName: "",
   setDefaultTaxRate: (rate) => set({ defaultTaxRate: rate }),
-  addItem: (product) =>
+  setCustomerName: (name) => set({ customerName: name }),
+  addItem: (product, quantity = 1) =>
     set((state) => ({
-      cart: addItemToCart(state.cart, product, 1, state.defaultTaxRate),
+      cart: addItemToCart(state.cart, product, quantity, state.defaultTaxRate),
     })),
   updateQuantity: (productId, quantity) =>
     set((state) => ({
@@ -41,5 +47,5 @@ export const useCartStore = create<CartStore>((set) => ({
     set((state) => ({
       cart: applyCartDiscount(state.cart, type, value),
     })),
-  clear: () => set({ cart: clearCart() }),
+  clear: () => set({ cart: clearCart(), customerName: "" }),
 }));

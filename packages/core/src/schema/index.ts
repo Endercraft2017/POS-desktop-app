@@ -17,6 +17,7 @@ export { settings } from "./settings";
 export { syncLog } from "./sync-log";
 export { auditLog } from "./audit-log";
 export { operationalExpenses } from "./operational-expenses";
+export { expensePayments } from "./expense-payments";
 export { customers, customersRelations } from "./customers";
 export { stockAdjustments, stockAdjustmentsRelations } from "./stock-adjustments";
 export {
@@ -26,4 +27,6 @@ export {
   purchaseOrderItemsRelations,
 } from "./purchase-orders";
 export { coupons, loyaltyRewards, loyaltyTransactions } from "./coupons";
+export { loyaltyCards } from "./loyalty-cards";
+export type { LoyaltyCard, NewLoyaltyCard } from "./loyalty-cards";
 export { refunds, refundsRelations, refundItems, refundItemsRelations } from "./refunds";

@@ -4,19 +4,23 @@ node_modules/
 
 # Build outputs
 dist/
+dist-web/
 build/
 *.tsbuildinfo
 
 # Environment
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
 # IDE
 .vscode/settings.json
 .idea/
 *.swp
 *.swo
+
+# Claude Code workspace notes — machine-specific paths, not for the repo
+CLAUDE.md
 
 # OS
 .DS_Store

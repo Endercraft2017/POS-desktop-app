@@ -2,12 +2,12 @@
   "expo": {
     "name": "POS System",
     "slug": "pos-mobile",
-    "version": "1.0.0",
+    "version": "1.0.5",
     "orientation": "default",
     "icon": "./src/assets/icon.png",
     "scheme": "pos",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "backgroundColor": "#0F172A"
     },
@@ -16,20 +16,19 @@
         "foregroundImage": "./src/assets/adaptive-icon.png",
         "backgroundColor": "#0F172A"
       },
-      "package": "com.pos.mobile"
-    },
-    "plugins": [
-      "expo-router",
-      "expo-secure-store",
-      [
-        "expo-font",
-        {
-          "fonts": []
-        }
+      "package": "com.pos.mobile",
+      "usesCleartextTraffic": true,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
       ]
-    ],
-    "experiments": {
-      "typedRoutes": true
-    }
+    },
+    "ios": {
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "POS uses the microphone to transcribe spoken orders into the cart."
+      }
+    },
+    "plugins": []
   }
 }

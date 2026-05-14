@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3KS POS System - Downloads</title>
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: #0F172A;
+      color: #E2E8F0;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── Login Gate ── */
+    .login-overlay {
+      position: fixed;
+      inset: 0;
+      background: #0F172A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+    }
+
+    .login-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .login-card {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+      transform: translateY(0);
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+
+    .login-overlay.hidden .login-card {
+      transform: translateY(-30px);
+      opacity: 0;
+    }
+
+    .login-logo {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-logo svg {
+      width: 36px;
+      height: 36px;
+      fill: white;
+    }
+
+    .login-card h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 6px;
+    }
+
+    .login-card p {
+      color: #94A3B8;
+      font-size: 14px;
+      margin-bottom: 28px;
+    }
+
+    .password-field {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .password-field input {
+      width: 100%;
+      padding: 14px 48px 14px 16px;
+      background: #0F172A;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      color: #F8FAFC;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .password-field input:focus {
+      border-color: #3B82F6;
+    }
+
+    .password-field input::placeholder {
+      color: #64748B;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #64748B;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+      color: #94A3B8;
+    }
+
+    .password-toggle svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .login-error {
+      color: #F87171;
+      font-size: 13px;
+      margin-bottom: 12px;
+      min-height: 20px;
+      transition: opacity 0.2s;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    /* ── Main Content ── */
+    .main-content {
+      opacity: 0;
+      transition: opacity 0.6s ease 0.3s;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 24px 60px;
+    }
+
+    .main-content.visible {
+      opacity: 1;
+    }
+
+    /* Header */
+    .page-header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    .header-logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 30px rgba(59, 130, 246, 0.3);
+    }
+
+    .header-logo svg {
+      width: 40px;
+      height: 40px;
+      fill: white;
+    }
+
+    .page-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 8px;
+    }
+
+    .page-header p {
+      color: #94A3B8;
+      font-size: 16px;
+    }
+
+    /* Download Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 48px;
+    }
+
+    .download-card {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px 28px;
+      text-align: center;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .download-card:hover {
+      transform: translateY(-4px);
+      border-color: #3B82F6;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 18px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-icon svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .download-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 4px;
+    }
+
+    .card-version {
+      font-size: 13px;
+      color: #3B82F6;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .card-platform {
+      font-size: 13px;
+      color: #94A3B8;
+      margin-bottom: 4px;
+    }
+
+    .card-size {
+      font-size: 12px;
+      color: #64748B;
+      margin-bottom: 20px;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      background: linear-gradient(135deg, #3B82F6, #2563EB);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .download-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: white;
+    }
+
+    /* Changelog */
+    .changelog-section {
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .changelog-header {
+      padding: 24px 28px 0;
+    }
+
+    .changelog-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 16px;
+    }
+
+    .changelog-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid #334155;
+    }
+
+    .changelog-tab {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      color: #94A3B8;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+
+    .changelog-tab:hover {
+      color: #CBD5E1;
+    }
+
+    .changelog-tab.active {
+      color: #3B82F6;
+    }
+
+    .changelog-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #3B82F6;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .changelog-body {
+      padding: 28px;
+    }
+
+    .changelog-panel {
+      display: none;
+    }
+
+    .changelog-panel.active {
+      display: block;
+    }
+
+    .changelog-version {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .changelog-version h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #F8FAFC;
+    }
+
+    .changelog-badge {
+      padding: 3px 10px;
+      background: rgba(59, 130, 246, 0.15);
+      color: #3B82F6;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .changelog-list {
+      list-style: none;
+      display: grid;
+      gap: 10px;
+    }
+
+    .changelog-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: #CBD5E1;
+    }
+
+    .changelog-list li::before {
+      content: '';
+      flex-shrink: 0;
+      width: 6px;
+      height: 6px;
+      background: #3B82F6;
+      border-radius: 50%;
+      margin-top: 8px;
+    }
+
+    /* Footer */
+    .page-footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: #475569;
+      font-size: 13px;
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .login-card {
+        margin: 0 16px;
+        padding: 36px 24px;
+      }
+
+      .page-header h1 {
+        font-size: 26px;
+      }
+
+      .changelog-body {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Login Overlay -->
+  <div class="login-overlay" id="loginOverlay">
+    <div class="login-card">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24"><path d="M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-3 18H10v-1h4v1zm3-3H7V5h10v12z"/></svg>
+      </div>
+      <h1>3KS POS System</h1>
+      <p>Enter the access password to view downloads</p>
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="password-field">
+          <input type="password" id="passwordInput" placeholder="Password" autocomplete="off" autofocus>
+          <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">
+            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg id="eyeOffIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+              <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+              <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <div class="login-error" id="loginError"></div>
+        <button type="submit" class="login-btn">Access Downloads</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
+    <header class="page-header">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm-3 18H10v-1h4v1zm3-3H7V5h10v12z"/></svg>
+      </div>
+      <h1>POS System Downloads</h1>
+      <p>Download the latest version for your platform</p>
+    </header>
+
+    <!-- Download Cards -->
+    <div class="cards-grid">
+      <!-- Windows Card -->
+      <div class="download-card">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="#3B82F6">
+            <path d="M3 12V6.75l8-1.25V12H3zm0 .5h8v6.5l-8-1.25V12.5zM11.5 12V5.35l9.5-1.6V12H11.5zm0 .5h9.5v8.25l-9.5-1.6V12.5z"/>
+          </svg>
+        </div>
+        <h3>Windows Desktop</h3>
+        <div class="card-version">POS System v1.0.1</div>
+        <div class="card-platform">Windows 10 / 11</div>
+        <div class="card-size">~84 MB</div>
+        <a href="releases/POS-System-Setup-1.0.1.exe" class="download-btn">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download .exe
+        </a>
+      </div>
+
+      <!-- Android Card -->
+      <div class="download-card">
+        <div class="card-icon">
+          <svg viewBox="0 0 24 24" fill="#3B82F6">
+            <path d="M6 18c0 .55.45 1 1 1h1v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h2v3.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5V19h1c.55 0 1-.45 1-1V8H6v10zM3.5 8C2.67 8 2 8.67 2 9.5v7c0 .83.67 1.5 1.5 1.5S5 17.33 5 16.5v-7C5 8.67 4.33 8 3.5 8zm17 0c-.83 0-1.5.67-1.5 1.5v7c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5v-7c0-.83-.67-1.5-1.5-1.5zm-4.97-5.84l1.3-1.3c.2-.2.2-.51 0-.71-.2-.2-.51-.2-.71 0l-1.48 1.48A5.84 5.84 0 0 0 12 1c-.96 0-1.86.23-2.66.63L7.85.15c-.2-.2-.51-.2-.71 0-.2.2-.2.51 0 .71l1.31 1.31A5.98 5.98 0 0 0 6 7h12c0-2.12-1.1-3.98-2.77-5.04l.3-.8zM10 5H9V4h1v1zm5 0h-1V4h1v1z"/>
+          </svg>
+        </div>
+        <h3>Android Mobile</h3>
+        <div class="card-version">POS System v1.0.1</div>
+        <div class="card-platform">Android 7.0+</div>
+        <div class="card-size">~90 MB</div>
+        <a href="releases/POS-System-1.0.1.apk" class="download-btn">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download .apk
+        </a>
+      </div>
+    </div>
+
+    <!-- Changelog -->
+    <div class="changelog-section">
+      <div class="changelog-header">
+        <h2>Changelog</h2>
+        <div class="changelog-tabs">
+          <button class="changelog-tab active" onclick="switchTab('desktop')">Desktop</button>
+          <button class="changelog-tab" onclick="switchTab('mobile')">Mobile</button>
+        </div>
+      </div>
+      <div class="changelog-body">
+        <!-- Desktop Changelog -->
+        <div class="changelog-panel active" id="tab-desktop">
+          <div class="changelog-version">
+            <h3>v1.0.1</h3>
+            <span class="changelog-badge">Bug Fix &amp; Improvements</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Fixed cloud sync module resolution (core package rebuild)</li>
+            <li>Added Cloud Sync settings panel (toggle, Sync Now, last sync time)</li>
+            <li>Added unit conversion system (mL/L/cups/tbsp/tsp, g/kg/oz/lb)</li>
+            <li>Product ingredients now show auto-converted equivalents</li>
+            <li>Unit selector when adding ingredients to products</li>
+            <li>Standardized unit options across platforms</li>
+          </ul>
+
+          <div class="changelog-version" style="margin-top: 16px;">
+            <h3>v1.0.0</h3>
+            <span class="changelog-badge">Initial Release</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Initial release</li>
+            <li>SQLite local database</li>
+            <li>Product management</li>
+            <li>Checkout &amp; payment processing</li>
+            <li>Order history</li>
+            <li>Dashboard with KPIs</li>
+            <li>Employee PIN authentication</li>
+            <li>Cloud sync support</li>
+          </ul>
+        </div>
+
+        <!-- Mobile Changelog -->
+        <div class="changelog-panel" id="tab-mobile">
+          <div class="changelog-version">
+            <h3>v1.0.1</h3>
+            <span class="changelog-badge">Bug Fix &amp; Improvements</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Fixed white screen crash on startup</li>
+            <li>Fixed cloud sync core module resolution</li>
+            <li>Improved sync client stability with op-sqlite</li>
+            <li>Added unit conversion system (mL/L/cups/tbsp/tsp, g/kg/oz/lb)</li>
+            <li>Recipe screen: enter ingredients in any compatible unit with auto-conversion</li>
+            <li>Standardized unit options across mobile and desktop</li>
+            <li>Sync startup wrapped in error handling — never crashes the app</li>
+          </ul>
+
+          <div class="changelog-version" style="margin-top: 16px;">
+            <h3>v1.0.0</h3>
+            <span class="changelog-badge">Initial Release</span>
+          </div>
+          <ul class="changelog-list">
+            <li>Initial release</li>
+            <li>Full POS checkout with cart</li>
+            <li>23+ management screens</li>
+            <li>Product / ingredient / recipe management</li>
+            <li>Customer loyalty program</li>
+            <li>Coupons &amp; promotions</li>
+            <li>Purchase orders &amp; inventory tracking</li>
+            <li>Sales forecasting &amp; reports</li>
+            <li>Z-report (end of day)</li>
+            <li>Barcode scanner support</li>
+            <li>Cloud sync support</li>
+            <li>Offline-first with automatic sync</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer class="page-footer">
+      &copy; 2026 3KS POS System
+    </footer>
+  </div>
+
+  <script>
+    // Check sessionStorage on load
+    (function () {
+      if (sessionStorage.getItem('pos_auth') === 'true') {
+        showDownloads();
+      }
+    })();
+
+    function handleLogin(e) {
+      e.preventDefault();
+      var pw = document.getElementById('passwordInput').value;
+      if (pw === 'afkcube_2017') {
+        sessionStorage.setItem('pos_auth', 'true');
+        showDownloads();
+      } else {
+        document.getElementById('loginError').textContent = 'Incorrect password. Please try again.';
+        document.getElementById('passwordInput').value = '';
+        document.getElementById('passwordInput').focus();
+      }
+      return false;
+    }
+
+    function showDownloads() {
+      document.getElementById('loginOverlay').classList.add('hidden');
+      document.getElementById('mainContent').classList.add('visible');
+    }
+
+    function togglePassword() {
+      var input = document.getElementById('passwordInput');
+      var eyeOn = document.getElementById('eyeIcon');
+      var eyeOff = document.getElementById('eyeOffIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        eyeOn.style.display = 'none';
+        eyeOff.style.display = 'block';
+      } else {
+        input.type = 'password';
+        eyeOn.style.display = 'block';
+        eyeOff.style.display = 'none';
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.changelog-tab').forEach(function (t) { t.classList.remove('active'); });
+      document.querySelectorAll('.changelog-panel').forEach(function (p) { p.classList.remove('active'); });
+      document.querySelector('[onclick="switchTab(\'' + tab + '\')"]').classList.add('active');
+      document.getElementById('tab-' + tab).classList.add('active');
+    }
+  </script>
+</body>
+</html>

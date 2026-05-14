@@ -1,0 +1,8 @@
+Today range: 2026-04-24T16:00:00.000Z -> 2026-04-25T15:59:59.999Z
+Today summary (DB query): {"revenue":0,"cogs":0,"orders":0}
+Gross profit (DB): 0.00
+Per-item breakdown: 0 rows
+Sum of line totals: 0.00
+Sum of line costs: 0.00
+Expected gross profit: 0.00
+Items missing cost_price: 0

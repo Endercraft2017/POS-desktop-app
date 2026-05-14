@@ -17,4 +17,8 @@ export const operationalExpenses = sqliteTable("operational_expenses", {
     .default("daily"),
   notes: text("notes"),
   isActive: integer("is_active", { mode: "boolean" }).notNull().default(true),
+  // A/P columns. paid_at NULL means the row is an unpaid payable; once paid,
+  // the payment date goes here and the row counts as a real cash-out expense.
+  dueDate: text("due_date"),
+  paidAt: text("paid_at"),
 });

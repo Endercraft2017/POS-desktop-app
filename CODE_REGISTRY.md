@@ -41,6 +41,7 @@
 | `src/schema/stock-adjustments.ts` | `stock_adjustments` |
 | `src/schema/purchase-orders.ts` | `purchase_orders`, `purchase_order_items` |
 | `src/schema/coupons.ts` | `coupons`, `loyalty_rewards`, `loyalty_transactions` |
+| `src/schema/loyalty-cards.ts` | `loyalty_cards` — physical punch-card QR program (5-digit codes, 9 stamps, 3 reward tiers) |
 | `src/schema/refunds.ts` | `refunds`, `refund_items` |
 | `src/schema/index.ts` | Barrel export |
 
@@ -207,6 +208,8 @@
 | `pages/OrdersPage.tsx` | `/orders` | Orders with filters (real orders) |
 | `pages/ProductsPage.tsx` | `/products` | Product CRUD (real DB mutations) |
 | `pages/DashboardPage.tsx` | `/dashboard` | KPI stats + low stock (real data) |
+| `pages/MessagesPage.tsx` | `/messages` | FB Page inbox viewer — threads + history; renders image attachments with Download / Store buttons |
+| `pages/CheckoutPage.tsx` | `/` | Cart, products, payment + Loyalty Cards section (Scan / Loyalty list / Download all) |
 | `pages/SettingsPage.tsx` | `/settings` | Config + sign out |
 
 ### Renderer Infrastructure
@@ -218,4 +221,10 @@
 | `stores/auth-store.ts` | Auth state |
 | `lib/db-bridge.ts` | IPC bridge (dbQuery, dbRun, dbExec) |
 | `lib/repositories.ts` | All 11 repository objects (raw SQL via IPC) |
+| `lib/messenger-api.ts` | Fetch helpers for `/api/messenger/threads` + `/thread/:psid`; `parseAttachments`, `storeAttachment`, `downloadAttachment` for image attachment support |
+| `components/ui/LoyaltyScanner.tsx` | Camera + jsQR + manual-entry scanner for loyalty card QRs |
+| `components/ui/LoyaltyCardModal.tsx` | Loyalty card popup: QR preview, editable name, 4×3 reward grid with stamp.png and reward icons |
+| `scripts/generate-loyalty-cards.js` | One-shot seed script: 50 5-digit codes → PNGs + zip + cloud DB rows via /api/sync/push |
+| `scripts/render-loyalty-pngs.js` | Re-renders PNGs from existing DB codes (called by deploy-web.bat after Vite clears dist-web/) |
+| `lib/messenger-notifications.ts` | Background poller of `/api/messenger/messages/recent`, fires desktop notifications + in-app toasts |
 | `constants/theme.ts` | Theme tokens (matches mobile) |

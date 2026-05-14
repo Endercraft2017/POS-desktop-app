@@ -1,18 +1,32 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useTheme } from "../../hooks/use-theme";
+import { useToday } from "../../hooks/use-today";
 import { orderRepo, ingredientRepo } from "../../lib/repositories";
 
 export function DashboardPage() {
+  const navigate = useNavigate();
   const { colors, spacing, borderRadius, fontSize } = useTheme();
+  const today = useToday();
 
   const { data: stats } = useQuery({
-    queryKey: ["stats"],
+    queryKey: ["stats", today],
     queryFn: () => orderRepo.getTodayStats(),
   });
 
+  const { data: byMethod } = useQuery({
+    queryKey: ["stats", "today-by-method", today],
+    queryFn: () => orderRepo.getTodayByMethod(),
+  });
+
+  const { data: todayProfit } = useQuery({
+    queryKey: ["stats", "today-profit", today],
+    queryFn: () => orderRepo.getTodayProfit(),
+  });
+
   const { data: todayOrders = [] } = useQuery({
-    queryKey: ["orders", "today"],
+    queryKey: ["orders", "today", today],
     queryFn: () => orderRepo.getToday(),
   });
 
@@ -63,7 +77,7 @@ export function DashboardPage() {
 
   const kpiRowStyle: React.CSSProperties = {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
+    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
     gap: spacing.md,
   };
 
@@ -136,28 +150,61 @@ export function DashboardPage() {
   };
 
   const statusBadge = (status: string): React.CSSProperties => {
-    const isHeld = status === "held";
+    const colorMap: Record<string, { bg: string; text: string }> = {
+      held: { bg: colors.infoLight, text: colors.info },
+      pending: { bg: colors.warningLight, text: colors.warning },
+      completed: { bg: colors.successLight, text: colors.success },
+      cancelled: { bg: colors.errorLight, text: colors.error },
+      refunded: { bg: colors.warningLight, text: colors.warning },
+    };
+    const c = colorMap[status] ?? { bg: colors.surfaceElevated, text: colors.textSecondary };
     return {
       display: "inline-block",
       padding: `${spacing.xs}px ${spacing.sm}px`,
       fontSize: fontSize.xs,
       fontWeight: 700,
       borderRadius: borderRadius.full,
-      backgroundColor: isHeld ? colors.infoLight : colors.warningLight,
-      color: isHeld ? colors.info : colors.warning,
+      backgroundColor: c.bg,
+      color: c.text,
       textTransform: "capitalize",
     };
   };
 
   return (
     <div style={containerStyle}>
-      <h1 style={headerStyle}>Dashboard</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1 style={headerStyle}>Dashboard</h1>
+        <button
+          style={{
+            padding: `${spacing.xs}px ${spacing.md}px`,
+            fontSize: fontSize.sm,
+            fontWeight: 600,
+            backgroundColor: colors.primary,
+            color: colors.textOnPrimary,
+            border: "none",
+            borderRadius: borderRadius.sm,
+            cursor: "pointer",
+            minHeight: 30,
+          }}
+          onClick={() => navigate("/statistics")}
+        >
+          Statistics
+        </button>
+      </div>
 
       {/* KPI Cards */}
       <div style={kpiRowStyle}>
         <div style={kpiCardStyle(colors.success)}>
           <p style={kpiLabelStyle}>Total Sales Today</p>
-          <p style={kpiValueStyle}>${kpiData.totalSales.toFixed(2)}</p>
+          <p style={kpiValueStyle}>₱{kpiData.totalSales.toFixed(2)}</p>
+        </div>
+        <div style={kpiCardStyle(colors.info ?? colors.primary)}>
+          <p style={kpiLabelStyle}>Cash</p>
+          <p style={kpiValueStyle}>₱{(byMethod?.cash ?? 0).toFixed(2)}</p>
+        </div>
+        <div style={kpiCardStyle(colors.warning ?? colors.accent)}>
+          <p style={kpiLabelStyle}>GCash</p>
+          <p style={kpiValueStyle}>₱{(byMethod?.gcash ?? 0).toFixed(2)}</p>
         </div>
         <div style={kpiCardStyle(colors.primary)}>
           <p style={kpiLabelStyle}>Order Count</p>
@@ -165,7 +212,16 @@ export function DashboardPage() {
         </div>
         <div style={kpiCardStyle(colors.accent)}>
           <p style={kpiLabelStyle}>Average Order</p>
-          <p style={kpiValueStyle}>${kpiData.averageOrder.toFixed(2)}</p>
+          <p style={kpiValueStyle}>₱{kpiData.averageOrder.toFixed(2)}</p>
+        </div>
+        <div style={kpiCardStyle(colors.success)}>
+          <p style={kpiLabelStyle} title="Sum over sold items of (selling price − material cost) × quantity">Estimated Profit</p>
+          <p style={{ ...kpiValueStyle, color: (todayProfit?.gross ?? 0) < 0 ? colors.error : colors.textPrimary }}>
+            ₱{(todayProfit?.gross ?? 0).toFixed(2)}
+          </p>
+          <div style={{ fontSize: fontSize.xs, color: colors.textTertiary, marginTop: 2 }}>
+            (Price − Mat cost) × Qty
+          </div>
         </div>
       </div>
 
@@ -269,7 +325,7 @@ export function DashboardPage() {
                       color: colors.textPrimary,
                     }}
                   >
-                    ${order.total.toFixed(2)}
+                    ₱{order.total.toFixed(2)}
                   </span>
                 </div>
               ))
@@ -336,7 +392,7 @@ export function DashboardPage() {
                       color: colors.textPrimary,
                     }}
                   >
-                    ${order.total.toFixed(2)}
+                    ₱{order.total.toFixed(2)}
                   </span>
                 </div>
               </div>
